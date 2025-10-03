@@ -229,8 +229,8 @@ def show_session(message):
 *Длительность:* 60-90 минут
 *Стоимость:* 3000₽"""
 
-    # Третье сообщение
-    text3 = """*Для записи напишите:* 
+    # Третье сообщение - УБИРАЕМ MARKDOWN для избежания ошибок
+    text3 = """Для записи напишите: 
 @kristina_guru
 или на почту: kristina@guru.ru
 
@@ -238,8 +238,7 @@ def show_session(message):
 
     bot.send_message(message.chat.id, text1, parse_mode='Markdown')
     bot.send_message(message.chat.id, text2, parse_mode='Markdown')
-    bot.send_message(message.chat.id, text3, parse_mode='Markdown')
-
+    bot.send_message(message.chat.id, text3)  # Без parse_mode
 
 # Обработчик для команды /weather или запросов о погоде
 @bot.message_handler(commands=['weather'])
