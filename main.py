@@ -2,6 +2,7 @@ import telebot
 import time
 import requests
 import json
+import os
 from datetime import datetime
 from telebot.types import ReplyKeyboardMarkup, KeyboardButton
 
@@ -12,6 +13,20 @@ bot = telebot.TeleBot(BOT_TOKEN)
 
 # Эмодзи
 emoji_ok = "✅"
+
+
+def read_text_file(filename):
+    """
+    Читает текстовый файл из папки data
+    """
+    try:
+        filepath = os.path.join('data', filename)
+        with open(filepath, 'r', encoding='utf-8') as file:
+            return file.read()
+    except FileNotFoundError:
+        return f"Файл {filename} не найден."
+    except Exception as e:
+        return f"Ошибка при чтении файла: {e}"
 
 
 def create_main_keyboard():
@@ -81,7 +96,7 @@ def get_weather_recommendation(weather_data):
 
     # Рекомендации по температуре
     if temp < -10:
-        recommendations.append("🥶 Очень холодно! Оденьтесь очень тепло - пуховик, шапка, шарф, перчитки")
+        recommendations.append("🥶 Очень холодно! Оденьтесь очень тепло - пуховик, шапка, шарф, перчатки")
     elif temp < 0:
         recommendations.append("❄️ Холодно! Наденьте зимнюю куртку, шапку и шарф")
     elif temp < 10:
@@ -107,29 +122,7 @@ def get_weather_recommendation(weather_data):
 # Обработчик команды /start и /help
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message):
-    welcome_text = """Что умеет этот бот?
-
-Привет! Я - бот помощник 
-Кристины Гугу по психологии, помогу
-получить полезные материалы.    
-
-Здесь Вы можете:
-
-✅ Прослушать бесплатные
-подкасты
-✅ Приобрести платные
-программы
-✅ Записаться на сессию
-
-👇 Нажмите "Начать", чтобы
-обрести ценные знания и стать
-уверенной в себе, привлекательной,
-смелой женщиной, которая творит
-свою жизнь - строит близкие
-теплые отношения, ценит,
-любит и уважает себя, и 
-управляет финансами, как взрослая!"""
-
+    welcome_text = read_text_file('welcome.txt')
     keyboard = create_main_keyboard()
     bot.send_message(message.chat.id, welcome_text, reply_markup=keyboard)
 
@@ -137,108 +130,31 @@ def send_welcome(message):
 # Обработчик кнопки "Начать"
 @bot.message_handler(func=lambda message: message.text == '🚀 Начать')
 def start_journey(message):
-    start_text = """🎉 Прекрасный выбор! Добро пожаловать в мир психологии и саморазвития!
-
-Выберите, что вас интересует:
-
-🎧 *Бесплатные подкасты* - вдохновляющие беседы и практические советы
-
-💎 *Платные программы* - глубокие трансформационные курсы
-
-📅 *Личная сессия* - индивидуальная работа с Кристиной
-
-Нажмите на соответствующую кнопку ниже 👇"""
-
+    start_text = read_text_file('start.txt')
     keyboard = create_main_keyboard()
-    bot.send_message(message.chat.id, start_text, reply_markup=keyboard, parse_mode='Markdown')
+    bot.send_message(message.chat.id, start_text, reply_markup=keyboard, parse_mode='HTML')
 
 
 # Обработчик кнопки "Подкасты"
 @bot.message_handler(func=lambda message: message.text == '🎧 Подкасты')
 def show_podcasts(message):
-    podcasts_text = """🎧 *Бесплатные подкасты*
-
-Здесь вы найдете подкасты на различные темы:
-
-• Отношения и любовь к себе
-• Финансовая грамотность
-• Уверенность в себе
-• Личностный рост
-
-*Ссылки на подкасты:*
-https://t.me/psychology_podcasts
-https://youtube.com/psychology_channel
-
-*Рекомендуем начать с:*
-"5 шагов к уверенности в себе"
-"Как полюбить себя настоящую\""""
-
-    bot.send_message(message.chat.id, podcasts_text, parse_mode='Markdown')
+    podcasts_text = read_text_file('podcasts.txt')
+    bot.send_message(message.chat.id, podcasts_text, parse_mode='HTML')
 
 
 # Обработчик кнопки "Программы"
 @bot.message_handler(func=lambda message: message.text == '💎 Программы')
 def show_programs(message):
-    # Первое сообщение
-    text1 = """💎 *Платные программы*
-
-Глубокие трансформационные курсы:"""
-
-    # Второе сообщение
-    text2 = """*1. "Путь к себе"* - 4900₽
-   - 10 уроков самопознания
-   - Медитации и практики
-   - Поддержка куратора"""
-
-    # Третье сообщение
-    text3 = """*2. "Финансовая уверенность"* - 6900₽
-   - Управление бюджетом
-   - Психология денег
-   - Стратегии роста доходов"""
-
-    # Четвертое сообщение
-    text4 = """*3. "Гармония в отношениях"* - 8900₽
-   - Построение здоровых отношений
-   - Работа с границами
-   - Исцеление прошлого"""
-
-    # Пятое сообщение
-    text5 = """Для покупки напишите: @kristina_guru"""
-
-    bot.send_message(message.chat.id, text1, parse_mode='Markdown')
-    bot.send_message(message.chat.id, text2, parse_mode='Markdown')
-    bot.send_message(message.chat.id, text3, parse_mode='Markdown')
-    bot.send_message(message.chat.id, text4, parse_mode='Markdown')
-    bot.send_message(message.chat.id, text5)
+    programs_text = read_text_file('programs.txt')
+    bot.send_message(message.chat.id, programs_text, parse_mode='HTML')
 
 
 # Обработчик кнопки "Сессия"
 @bot.message_handler(func=lambda message: message.text == '📅 Сессия')
 def show_session(message):
-    # Первое сообщение
-    text1 = """📅 *Запись на сессию*
+    session_text = read_text_file('session.txt')
+    bot.send_message(message.chat.id, session_text, parse_mode='HTML')
 
-*Индивидуальная консультация с Кристиной:*
-
-- Глубокий разбор вашей ситуации
-- Персональные рекомендации
-- Поддержка и сопровождение"""
-
-    # Второе сообщение
-    text2 = """*Формат:* онлайн (Zoom/Skype)
-*Длительность:* 60-90 минут
-*Стоимость:* 3000₽"""
-
-    # Третье сообщение - УБИРАЕМ MARKDOWN для избежания ошибок
-    text3 = """Для записи напишите: 
-@kristina_guru
-или на почту: kristina@guru.ru
-
-Укажите удобное время и кратко опишите ваш запрос."""
-
-    bot.send_message(message.chat.id, text1, parse_mode='Markdown')
-    bot.send_message(message.chat.id, text2, parse_mode='Markdown')
-    bot.send_message(message.chat.id, text3)  # Без parse_mode
 
 # Обработчик для команды /weather или запросов о погоде
 @bot.message_handler(commands=['weather'])
@@ -318,5 +234,10 @@ def echo_all(message):
 
 
 if __name__ == '__main__':
+    # Проверяем существование папки data
+    if not os.path.exists('data'):
+        os.makedirs('data')
+        print("Создана папка 'data'. Добавьте в нее текстовые файлы.")
+
     print("Бот запущен!")
     bot.infinity_polling()
